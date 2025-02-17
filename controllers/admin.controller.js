@@ -20,7 +20,7 @@ const addMemberController = async (req, res) => {
             username,
             email,
             password: hashedPassword
-        })
+        }).select("-password")
         return res.status(201).json({
             status: "ok",
             message: "Member Added Successfully",
@@ -44,7 +44,7 @@ const updateMemberController = async (req, res) => {
         if (!name && !email && !username && !password){
             return res.status(400).json({
                 status: "error",
-                message: "Please fill in at least one field"
+                message: "Please update at least one field"
             });
         }
 
@@ -52,9 +52,9 @@ const updateMemberController = async (req, res) => {
         if (name) query.name = name;
         if (email) query.email = email;
         if (username) query.username = username;
-        if (password) query.password = (await bcrypt.hash(password, 10));
+        if (password) query.password = (await bcrypt.hash(password, 10));        
 
-        const member = User.findByIdAndUpdate(
+        const member = await User.findByIdAndUpdate(
             userId,
             {
                 $set: query
@@ -62,7 +62,8 @@ const updateMemberController = async (req, res) => {
             {
                 new: true
             }
-        )
+        ).select("-password")
+
         return res.status(200).json({
             status: "ok",
             message: "Member Updated Successfully",

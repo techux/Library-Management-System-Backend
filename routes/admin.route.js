@@ -18,8 +18,8 @@ const router = express.Router();
 
 router.get("/search", searchMemberController) ;
 router.get("/members", viewAllMembersController);
-router.get("/member/:id", viewMemberController);
 router.post("/member", addMemberController);
+router.get("/member/:id", viewMemberController);
 router.patch("/member/:id", updateMemberController);
 router.delete("/member/:id", removeMemberCotroller)
 

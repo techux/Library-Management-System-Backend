@@ -71,7 +71,8 @@ const searchBookController = async (req, res) => {
                 { title: { $regex: keyword, $options: 'i' } },
                 { description: { $regex: keyword, $options: 'i' } },
                 { author: { $regex: keyword, $options: 'i' } },
-                { genre: { $regex: keyword, $options: 'i' } }
+                { genre: { $regex: keyword, $options: 'i' } },
+                { slug: { $regex: keyword, $options: 'i' } },
             ]
         });
         
@@ -101,7 +102,7 @@ const addBookController = async (req, res) => {
             })
         }
 
-        const slug = slugify(this.title.toLowerCase(),{strict:true}) +"-"+ customAlphabet(alphabet, 10)() ;
+        const slug = slugify(title.toLowerCase(),{strict:true}) +"-"+ customAlphabet(alphabet, 10)() ;
 
         const book = await Book.create({
             title,
@@ -211,13 +212,18 @@ const deleteBookController = async (req, res) => {
 const borrowBookController = async (req, res) => {
     try {
         const bookId = req.params.id;
-        if (!id){
+        if (!bookId){
             return res.status(400).json({
                 status: "error",
                 message: "Please select a book to borrow"
             })
         }
-
+        if (!mongoose.Types.ObjectId.isValid(bookId)){
+            return res.status(400).json({
+                status: "error",
+                message: "Invalid Book ID passed"
+            })
+        }
         // check if book is already there in user book shelf
         const isBookAlreadyBorrowed = await User.findOne({
             _id: req.user.id,
@@ -231,7 +237,7 @@ const borrowBookController = async (req, res) => {
         }
 
         // book is not in the shelf, so add it
-        const addBook = await User.findByIdAndUpdate(
+        await User.findByIdAndUpdate(
             req.user.id,
             {
                 $push: {
@@ -242,12 +248,11 @@ const borrowBookController = async (req, res) => {
                 new: true
             }
         )
-        // TODO: to check is password is returned or not
 
         return res.status(200).json({
             status: "ok",
             message: "Book added on your book shelf",
-            data: addBook
+            // data: addBook
         })
 
     } catch (error) {
@@ -277,15 +282,19 @@ const removeBookFromShelfController = async (req, res) => {
                 message: "Invalid book id is passed"
             })
         }
+        // remoe book from myBooks and add it to bookHistory
         await User.findByIdAndUpdate(
             req.user.id,
             {
-                $pop: {
+                $pull: {
                     mybooks: bookId
+                },
+                $push: {
+                    bookHistory: bookId
                 }
             }
-        )
-        // TODO: 
+        );        
+
         return res.status(200).json({
             status: "ok",
             message: "Book removed from Shelf"
