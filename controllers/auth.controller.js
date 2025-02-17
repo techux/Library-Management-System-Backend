@@ -6,23 +6,17 @@ const { validate } = require("email-validator")
 
 const loginController = async (req, res) => {
     try {
-        const {email, username, password} = req.body ;
-        if ((!email && !username) || !password){
+        const {emailOrUsername, password} = req.body ;
+        if (!emailOrUsername || !password) {
             return res.status(400).json({
                 status: "error",
                 message: "Please enter all fields"
             })
         }
-        if (email && !validate(email)){
-            return res.status(400).json({
-                status: "error",
-                message: "Invalid email address"
-            })
-        }
         const user = await User.findOne({
             $or: [
-                {email},
-                {username}
+                {email: emailOrUsername},
+                {username: emailOrUsername}
             ]
         });
 
