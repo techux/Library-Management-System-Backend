@@ -7,22 +7,39 @@ const { customAlphabet } = require('nanoid');
 const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 
-// get all books
 const allBookController = async (req, res) => {
     try {
-        const books = await Book.find({});
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const books = await Book.find({}).skip(skip).limit(limit);
+
+        const totalBooks = await Book.countDocuments();
+        const totalPages = Math.ceil(totalBooks / limit);
+
         return res.status(200).json({
             status: "ok",
-            data: books
-        })
+            data: {
+                books,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalBooks,
+                    limit
+                }
+            }
+        });
+
     } catch (error) {
-        console.error(`Error in allBookController: ${error.stack || error.message}`)
+        console.error(`Error in allBookController: ${error.stack || error.message}`);
         return res.status(500).json({
             status: "error",
             message: "Internal Server Error"
         });
     }
-}
+};
+
 
 
 // get book by slug
@@ -312,28 +329,76 @@ const removeBookFromShelfController = async (req, res) => {
 // get all books of user || get all borrowed books of user || /mybooks
 const myBookController = async (req, res) => {
     try {
-        const books = await User.findById(req.user.id).select("mybooks").populate("mybooks");
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const user = await User.findById(req.user.id).select("mybooks")
+            .populate({
+                path: "mybooks",
+                options: {
+                    skip: skip,
+                    limit: limit
+                }
+            });
+
+        const totalBooks = user.mybooks.length;
+        const totalPages = Math.ceil(totalBooks / limit);
+
         return res.status(200).json({
             status: "ok",
-            data: books
-        })
+            data: {
+                mybooks: user.mybooks,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalBooks,
+                    limit
+                }
+            }
+        });
     } catch (error) {
-        console.error(`Error in myBookController: ${error.stack || error.message}`)
+        console.error(`Error in myBookController: ${error.stack || error.message}`);
         return res.status(500).json({
             status: "error",
             message: "Internal Server Error"
         });
     }
-}
+};
+
 
 
 // get all returned books of user || like borrowed history || /history || adv
 const myHistoryController = async (req, res) => {
     try {
-        const books = await User.findById(req.user.id).select("bookHistory").populate("bookHistory");
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const user = await User.findById(req.user.id).select("bookHistory").
+        populate({
+            path: "bookHistory",
+            options: {
+                skip: skip,
+                limit: limit
+            }
+        });
+        // populate("bookHistory");
+
+        const totalBooks = user.bookHistory.length;
+        const totalPages = Math.ceil(totalBooks / limit);
+
         return res.status(200).json({
             status: "ok",
-            data: books
+            data: {
+                book: user.bookHistory,
+                pagination: {
+                    currentPage: page,
+                    totalPages,
+                    totalBooks,
+                    limit
+                }
+            }
         })
     } catch (error) {
         console.error(`Error in myHistoryController: ${error.stack || error.message}`)
