@@ -6,6 +6,7 @@ var slugify = require('slugify')
 const { customAlphabet } = require('nanoid');
 const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
+const cloudinary = require("../utils/cloudinary")
 
 const allBookController = async (req, res) => {
     try {
@@ -41,7 +42,6 @@ const allBookController = async (req, res) => {
 };
 
 
-
 // get book by slug
 const getBookBySlugController = async (req, res) => {
     try {
@@ -65,6 +65,38 @@ const getBookBySlugController = async (req, res) => {
         })
     } catch (error) {
         console.error(`Error in getBookBySlugController: ${error.stack || error.message}`)
+        return res.status(500).json({
+            status: "error",
+            message: "Internal Server Error"
+        });
+    }
+}
+
+
+// get book by id
+const getBookByIdController = async (req, res) => {
+    try {
+        const id = req.params.id;
+        if (!id) {
+            return res.status(400).json({
+                status: "error",
+                message: "Id is required"
+            })
+        }
+        const book = await Book.findById(id);
+        if (!book) {
+            return res.status(404).json({
+                status: "error",
+                message: "Book not found"
+            })
+        }
+        return res.status(200).json({
+            status: "ok",
+            data: book
+        })
+    }
+    catch (error) {
+        console.error(`Error in getBookByIdController: ${error.stack || error.message}`)
         return res.status(500).json({
             status: "error",
             message: "Internal Server Error"
@@ -111,15 +143,41 @@ const searchBookController = async (req, res) => {
 // add a new book 
 const addBookController = async (req, res) => {
     try {
-        const {title, description, author, genre} = req.body ;
-        if (!title || !description || !author || !genre){
+        const { title, description, author, genre } = req.body;
+
+        const thumbnail = req.files.thumbnail ? req.files.thumbnail[0] : null;
+        const bookPdf = req.files.bookPdf ? req.files.bookPdf[0] : null;
+
+        if (!title || !description || !author || !genre) {
             return res.status(400).json({
                 status: "error",
                 message: "Please fill in all the fields"
-            })
+            });
         }
 
-        const slug = slugify(title.toLowerCase(),{strict:true}) +"-"+ customAlphabet(alphabet, 10)() ;
+        if (!thumbnail || !bookPdf) {
+            return res.status(400).json({
+                status: "error",
+                message: "Please upload both a thumbnail image and a book PDF file"
+            });
+        }
+
+        const uploadedThumbnail = await cloudinary.uploader.upload(thumbnail.path, {
+            folder: 'book_thumbnails',
+            public_id: `thumbnail-${Date.now()}-${title}`,
+            resource_type: 'image', 
+        });
+
+        const uploadedPdf = await cloudinary.uploader.upload(bookPdf.path, {
+            resource_type: 'raw', 
+            public_id: `book_pdfs/${title}-${Date.now()}`,
+            folder: 'book_pdfs'
+        });
+
+        const thumbnailUrl = uploadedThumbnail.secure_url;
+        const pdfUrl = uploadedPdf.secure_url;
+
+        const slug = slugify(title.toLowerCase(), { strict: true }) + "-" + customAlphabet(alphabet, 10)();
 
         const book = await Book.create({
             title,
@@ -127,22 +185,24 @@ const addBookController = async (req, res) => {
             slug,
             author,
             genre,
-        })
+            thumbnail: thumbnailUrl,
+            bookLink: pdfUrl
+        });
 
         return res.status(201).json({
             status: "ok",
             message: "Book Added Successfully",
             data: book
-        })
+        });
+        
     } catch (error) {
-        console.error(`Error in addBookController: ${error.stack || error.message}`)
+        console.error(`Error in addBookController: ${error.stack || error.message}`);
         return res.status(500).json({
             status: "error",
             message: "Internal Server Error"
         });
     }
-}
-
+};
 
 // edit book details
 const updateBookController = async (req, res) => {
@@ -429,6 +489,7 @@ const myHistoryController = async (req, res) => {
 module.exports = {
     allBookController,
     getBookBySlugController,
+    getBookByIdController,
     searchBookController,
     addBookController,
     updateBookController,

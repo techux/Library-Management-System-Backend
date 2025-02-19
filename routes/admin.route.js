@@ -1,4 +1,6 @@
 const express = require('express');
+const upload = require("../middlewares/multer.middleware");
+
 const {
     addMemberController,
     updateMemberController,
@@ -25,7 +27,7 @@ router.get("/member/:id", viewMemberController);
 router.patch("/member/:id", updateMemberController);
 router.delete("/member/:id", removeMemberCotroller)
 
-router.post("/book", addBookController);
+router.post('/book', upload.fields([{ name: 'thumbnail', maxCount: 1 }, { name: 'bookPdf', maxCount: 1 }]), addBookController);
 router.patch("/book/:id", updateBookController);
 router.delete("/book/:id", deleteBookController);
 
