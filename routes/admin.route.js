@@ -5,7 +5,8 @@ const {
     viewMemberController,
     viewAllMembersController,
     removeMemberCotroller,
-    searchMemberController
+    searchMemberController,
+    statController
     } = require("../controllers/admin.controller");
 
 const {
@@ -16,6 +17,7 @@ const {
 
 const router = express.Router();
 
+router.get("/stats", statController) ;
 router.get("/search", searchMemberController) ;
 router.get("/members", viewAllMembersController);
 router.post("/member", addMemberController);

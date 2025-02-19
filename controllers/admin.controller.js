@@ -182,6 +182,29 @@ const searchMemberController = async (req, res) => {
     }
 }
 
+const statController = async (req, res) => {
+    try {
+        const users = await User.countDocuments() ;
+        const books = await Book.countDocuments() ;
+        const borrowedBooks = await Book.countDocuments({ status: "Borrowed" }) ;
+
+        return res.status(200).json({
+            status: "ok",
+            data: {
+                users,
+                books,
+                borrowedBooks
+            }
+        })
+    } catch (error) {
+        console.error(`Error in statController : ${error.stack || error.message}`);
+        return res.status(500).json({
+            status:"error", 
+            message: "Internal Server Error" 
+        });
+    }
+}
+
 
 module.exports = {
     addMemberController,
@@ -189,5 +212,6 @@ module.exports = {
     viewMemberController,
     viewAllMembersController,
     removeMemberCotroller,
-    searchMemberController
+    searchMemberController,
+    statController
 }
