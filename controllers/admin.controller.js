@@ -20,7 +20,7 @@ const addMemberController = async (req, res) => {
             username,
             email,
             password: hashedPassword
-        }).select("-password")
+        })
         return res.status(201).json({
             status: "ok",
             message: "Member Added Successfully",
