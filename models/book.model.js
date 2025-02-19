@@ -29,7 +29,8 @@ const bookSchema = new mongoose.Schema({
     },
     thumbnail: {
         type: String,
-        required: true
+        required: true,
+        default: "/assets/book.png"
     },
     bookLink: {
         type: String,

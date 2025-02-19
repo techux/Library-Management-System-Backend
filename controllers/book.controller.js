@@ -266,6 +266,14 @@ const borrowBookController = async (req, res) => {
             }
         )
 
+        await Book.findByIdAndUpdate(bookId,
+            {
+                $set: {
+                    status: 'Borrowed'
+                }
+            }
+        )
+
         return res.status(200).json({
             status: "ok",
             message: "Book added on your book shelf",
@@ -310,7 +318,15 @@ const removeBookFromShelfController = async (req, res) => {
                     bookHistory: bookId
                 }
             }
-        );        
+        );      
+        
+        await Book.findByIdAndUpdate(bookId,
+            {
+                $set: {
+                    status: 'Available'
+                }
+            }
+        )
 
         return res.status(200).json({
             status: "ok",
