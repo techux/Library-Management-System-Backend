@@ -21,6 +21,20 @@ const bookSchema = new mongoose.Schema({
     genre: {
         type: String,
         required: true
+    },
+    status: {
+        type: String,
+        enum: ['Available', 'Borrowed'],
+        default: 'Available'
+    },
+    thumbnail: {
+        type: String,
+        required: true
+    },
+    bookLink: {
+        type: String,
+        required: true,
+        default: "/assets/book.png"
     }
 },{
     timestamps: true,
