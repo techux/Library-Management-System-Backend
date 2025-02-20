@@ -1,4 +1,11 @@
 # Library Management System _[Backend]_
+
+**Live Link: [https://library-backend.koyeb.app/api/ping](https://library-backend.koyeb.app/api/ping)**
+
+**Frontend Live Link: [https://library-devesh.vercel.app/](https://library-devesh.vercel.app/)**
+
+
+
 Frontend here: [techux/Library-Management-System-Frontend](https://github.com/techux/Library-Management-System-Frontend)
 
 This is a simple Library Management System developed using **Node.js**. It has two main perspectives: **Reader** and **Librarian**.
@@ -48,6 +55,17 @@ npm run dev
 ```
 
 6. Open your web browser and navigate to `http://localhost:8080` to access the server.
+
+---
+
+## DB Design Used
+![image](https://github.com/user-attachments/assets/4ab5a5a2-9d76-457d-9ee6-f36c99e207bc)
+
+<br>
+
+**Alternate Approach**
+![image](https://github.com/user-attachments/assets/7ce43e72-96a6-4349-9475-aaa98a88b5b5)
+
 
 ---
 
