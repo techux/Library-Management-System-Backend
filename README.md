@@ -4,7 +4,7 @@
 
 **Frontend Live Link: [https://library-devesh.vercel.app/](https://library-devesh.vercel.app/)**
 
-
+**[Documentation](https://documenter.getpostman.com/view/26661759/2sAYdZvEdr)**
 
 Frontend here: [techux/Library-Management-System-Frontend](https://github.com/techux/Library-Management-System-Frontend)
 
@@ -70,6 +70,10 @@ npm run dev
 ---
 
 ## API Documentation
+[Documentation on Postman](https://documenter.getpostman.com/view/26661759/2sAYdZvEdr) <br>
+[https://documenter.getpostman.com/view/26661759/2sAYdZvEdr](https://documenter.getpostman.com/view/26661759/2sAYdZvEdr)
+
+<!--
 ### Authentication Routes
 | Sr. No. | Method | Endpoint | Body | Description |
 |:--:|:--:|--|--|--|
@@ -115,6 +119,7 @@ npm run dev
 | 7 | POST | /api/admin/book/ | {title, description, author, genre} | Add new Book |
 | 8 | PATCH | /api/admin/book/:id | {title, description, author, genre} | Update book details |
 | 9 | DELETE | /api/admin/book/:id |  | Delete Book |
+-->
 
 
 # Devesh Singh
